@@ -1,6 +1,10 @@
 
 import UIKit
 
+public protocol ICSwipeActionsTableCellDelegate : NSObjectProtocol {
+    func swipeCellButtonPressedWithTitle(title: String, indexPath: NSIndexPath)
+}
+
 public class ICSwipeActionsTableCell: UITableViewCell {
     
     // MARK: - properties
@@ -8,6 +12,8 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     public var buttonsTitles = []
     public var animationDuration = 0.3
     
+    public var delegate: ICSwipeActionsTableCellDelegate?
+
     // MARK: - private properties
 
     private var _panRec: UIPanGestureRecognizer?
@@ -59,23 +65,8 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         self.setupEverythigng()
     }
 
+    
     // MARK: - ICSwipeActionsTableCell
-
-    func viewPanned(panRec: UIPanGestureRecognizer) {
-        let velocity = panRec.velocityInView(self)
-        if (velocity.x < 0) { // view panned left
-            if (panRec.state == .Began) {
-                self.handleLeftPanGestureBegan()
-            }
-        }
-        
-        self.handleLeftPanGestureChanged(panRec)
-        
-        if (panRec.state == .Ended) {
-            self.handlePanGestureEnded(panRec, velocity: velocity)
-        }
-        
-    }
 
     func hideButtons() {
         self.hideButtons(true)
@@ -100,8 +91,38 @@ public class ICSwipeActionsTableCell: UITableViewCell {
             }
         }
     }
+    
 
+    // MARK: - ICSwipeActionsTableCell internal
 
+    internal func viewPanned(panRec: UIPanGestureRecognizer) {
+        let velocity = panRec.velocityInView(self)
+        if (velocity.x < 0) { // view panned left
+            if (panRec.state == .Began) {
+                self.handleLeftPanGestureBegan()
+            }
+        }
+        
+        self.handleLeftPanGestureChanged(panRec)
+        
+        if (panRec.state == .Ended) {
+            self.handlePanGestureEnded(panRec, velocity: velocity)
+        }
+        
+    }
+
+    func buttonTouchUpInside(sender: UIButton) {
+        if delegate != nil {
+            if delegate!.respondsToSelector("swipeCellButtonPressedWithTitle::") {
+                let indexPath = self.currentTableView()?.indexPathForCell(self)
+                if indexPath != nil {
+                    self.delegate!.swipeCellButtonPressedWithTitle(sender.titleLabel!.text!, indexPath: indexPath!)
+                }
+            }
+        }
+    }
+
+    
     // MARK: - ICSwipeActionsTableCell ()
     
     
@@ -138,7 +159,6 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         _buttonsView = nil
         _buttonsAreHiding = false
     }
-
     
     // MARK: - GestureHandlers
 
@@ -178,20 +198,8 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         panRec.setTranslation(CGPointZero, inView: self)
     }
     
-    // MARK: - 
     
-    private func addTableOverlay() {
-        if let table = self.currentTableView() {
-            _currentTableViewOverlay = ICTableViewOvelay(frame: table.frame)
-            _currentTableViewOverlay?.parentCell = self
-            table.addSubview(_currentTableViewOverlay!)
-        }
-    }
-
-    private func removeTableOverlay() {
-        _currentTableViewOverlay?.removeFromSuperview()
-        _currentTableViewOverlay = nil
-    }
+    // MARK: - 
     
     private func currentTableView() -> UITableView? {
         if (_currentTableView == nil) {
@@ -206,7 +214,6 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         return _currentTableView
     }
     
-    
     public override func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
         if gestureRecognizer == _tapRec {
             let tapLocation = gestureRecognizer.locationInView(_currentTableViewOverlay)
@@ -218,6 +225,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         }
         return true
     }
+    
     
     // MARK: - Table view overlay
     
@@ -243,6 +251,19 @@ public class ICSwipeActionsTableCell: UITableViewCell {
             parentCell?.hideButtons()
             return nil;
         }
+    }
+
+    private func addTableOverlay() {
+        if let table = self.currentTableView() {
+            _currentTableViewOverlay = ICTableViewOvelay(frame: table.frame)
+            _currentTableViewOverlay?.parentCell = self
+            table.addSubview(_currentTableViewOverlay!)
+        }
+    }
+    
+    private func removeTableOverlay() {
+        _currentTableViewOverlay?.removeFromSuperview()
+        _currentTableViewOverlay = nil
     }
 
 }
