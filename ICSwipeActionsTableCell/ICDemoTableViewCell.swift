@@ -1,7 +1,9 @@
 
 import UIKit
 
-class ICDemoTableViewCell: UITableViewCell {
+let ICDemoTableViewCellIdentifier = "demoTableViewCell";
+
+class ICDemoTableViewCell: ICSwipeActionsTableCell {
 
 
 }
