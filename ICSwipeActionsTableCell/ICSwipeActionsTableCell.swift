@@ -8,6 +8,8 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     public var buttonsTitles = []
     public var animationDuration = 0.3
     
+    // MARK: - private properties
+
     private var _panRec: UIPanGestureRecognizer?
     private var _tapRec: UITapGestureRecognizer?
     
@@ -21,6 +23,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     
     private var _currentTouchInView = CGPointZero
     private var _currentTableView: UITableView?
+    private var _currentTableViewOverlay: ICTableViewOvelay?
 
     // MARK: - NSObject
 
@@ -29,6 +32,9 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         self.setupEverythigng()
     }
 
+    deinit {
+        self.removeTableOverlay()
+    }
     
     // MARK: - UIView
 
@@ -40,6 +46,10 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     public override func hitTest(point: CGPoint, withEvent event: UIEvent?) -> UIView? {
         _currentTouchInView = self.convertPoint(point, toView:self.contentView)
         return super.hitTest(point, withEvent: event)
+    }
+    
+    public override func willMoveToSuperview(newSuperview: UIView?) {
+        self.removeTableOverlay()
     }
     
     // MARK: - UITableViewCell
@@ -60,13 +70,37 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         }
         
         self.handleLeftPanGestureChanged(panRec)
-
+        
         if (panRec.state == .Ended) {
             self.handlePanGestureEnded(panRec, velocity: velocity)
         }
-
+        
     }
-    
+
+    func hideButtons() {
+        self.hideButtons(true)
+    }
+    func hideButtons(animated: Bool) {
+        if ( !_buttonsAreHiding) {
+            let newContentViewCenter = CGPointMake(_initialContentViewCenter.x, self.contentView.center.y)
+            _currentContentViewCenter = newContentViewCenter
+            _swipeExpanded = false
+            _buttonsAreHiding = true
+            self.removeTableOverlay()
+            
+            if animated {
+                UIView.animateWithDuration(animationDuration, delay: 0, options: .CurveEaseInOut, animations: { () -> Void in
+                    self.contentView.center = newContentViewCenter
+                    }) { (completed) -> Void in
+                        self.removeButtonsView()
+                }
+            } else {
+                self.contentView.center = newContentViewCenter
+                self.removeButtonsView()
+            }
+        }
+    }
+
 
     // MARK: - ICSwipeActionsTableCell ()
     
@@ -85,14 +119,6 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         }
     }
     
-    private func addTapGestureRecogniser() {
-        _tapRec = UITapGestureRecognizer(target: self, action: "viewPanned:")
-        if let validPan = _tapRec {
-            validPan.delegate = self
-            self.addGestureRecognizer(validPan)
-        }
-    }
-    
     
     // MARK: - Button views
 
@@ -104,6 +130,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         _buttonsView!.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         _buttonsView!.backgroundColor = UIColor.redColor()
         self.contentView.addSubview(_buttonsView!)
+        self.addTableOverlay()
     }
     
     private func removeButtonsView() {
@@ -153,20 +180,69 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     
     // MARK: - 
     
-    private func hideButtons() {
-        if ( !_buttonsAreHiding) {
-            let newContentViewCenter = CGPointMake(_initialContentViewCenter.x, self.contentView.center.y)
-            _currentContentViewCenter = newContentViewCenter
-            _swipeExpanded = false
-            _buttonsAreHiding = true
-            
-            UIView.animateWithDuration(animationDuration, delay: 0, options: .CurveEaseInOut, animations: { () -> Void in
-                self.contentView.center = newContentViewCenter
-                }) { (completed) -> Void in
-                    self.removeButtonsView()
+    private func addTableOverlay() {
+        if let table = self.currentTableView() {
+            _currentTableViewOverlay = ICTableViewOvelay(frame: table.frame)
+            _currentTableViewOverlay?.parentCell = self
+            table.addSubview(_currentTableViewOverlay!)
+        }
+    }
+
+    private func removeTableOverlay() {
+        _currentTableViewOverlay?.removeFromSuperview()
+        _currentTableViewOverlay = nil
+    }
+    
+    private func currentTableView() -> UITableView? {
+        if (_currentTableView == nil) {
+            var view = self.superview;
+            while (view != nil) {
+                if (view!.isKindOfClass(UITableView.self)) {
+                    _currentTableView = view as? UITableView
+                }
+                view = view!.superview
             }
         }
+        return _currentTableView
     }
     
     
+    public override func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
+        if gestureRecognizer == _tapRec {
+            let tapLocation = gestureRecognizer.locationInView(_currentTableViewOverlay)
+            if let _ = _buttonsView {
+                if CGRectContainsPoint(_buttonsView!.frame, tapLocation) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+    
+    // MARK: - Table view overlay
+    
+    class ICTableViewOvelay: UIView {
+        var parentCell : ICSwipeActionsTableCell?
+        
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            self.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+            self.backgroundColor = UIColor.clearColor()
+        }
+
+        required init(coder aDecoder: NSCoder) {
+            super.init(coder: aDecoder)
+        }
+        
+        override func hitTest(point: CGPoint, withEvent event: UIEvent?) -> UIView? {
+            if parentCell != nil {
+                if CGRectContainsPoint(parentCell!.bounds, self.convertPoint(point, toView: parentCell)) {
+                    return nil
+                }
+            }
+            parentCell?.hideButtons()
+            return nil;
+        }
+    }
+
 }
