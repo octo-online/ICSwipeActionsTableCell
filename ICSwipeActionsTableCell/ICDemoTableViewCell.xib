@@ -7,15 +7,15 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" indentationWidth="10" reuseIdentifier="demoTableViewCell" rowHeight="88" id="bHs-IB-gfX" customClass="ICDemoTableViewCell" customModule="ICSwipeActionsTableCell" customModuleProvider="target">
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="demoTableViewCell" rowHeight="88" id="bHs-IB-gfX" customClass="ICDemoTableViewCell" customModule="ICSwipeActionsTableCell" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="398" height="88"/>
             <autoresizingMask key="autoresizingMask"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="bHs-IB-gfX" id="y0P-b5-aMt">
-                <rect key="frame" x="0.0" y="0.0" width="398" height="88"/>
+                <rect key="frame" x="0.0" y="0.0" width="398" height="87.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NYH-Xv-7lt">
-                        <rect key="frame" x="0.0" y="0.0" width="398" height="88"/>
+                        <rect key="frame" x="0.0" y="0.0" width="398" height="87.5"/>
                         <subviews>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="G39-gO-cY1">
                                 <rect key="frame" x="178" y="23" width="42" height="42"/>

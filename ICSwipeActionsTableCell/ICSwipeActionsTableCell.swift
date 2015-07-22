@@ -20,20 +20,28 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     
     // MARK: - properties
 
-    /**
-        Array of button title properties, this can be one of three types: 
-        - Plain string ex. ["Title 1", "Title 2"]
-        - ICButtonTitleWithColor type ex. [(title: "Title 1", color: UIColor.blackColor()), (title: "Title 2", color: UIColor.redColor())]
-        - ICButtonTitleWithFontTextAndBackgroundColor type ex. [(title: "Title 1", font: UIFont.systemFontOfSize(22), textColor: UIColor.whiteColor(), color: UIColor.redColor())]
-        Cell will recognise provided type automatically. All you need to worry about is the type that suits you best.
-    */
+    
+    /// Array of button title properties, this can be one of three types:
+    /// 1. Plain string:
+    ///     // cell.buttonsTitles = ["Title 1", "Title 2"]
+    ///
+    /// 2. ICButtonTitleWithColor type:
+    ///     // cell.buttonsTitles = [(title: "Title 1", color: UIColor.blackColor()), (title: "Title 2", color: UIColor.redColor())]
+    ///
+    /// 3. ICButtonTitleWithTextAndBackgroundColor type:
+    ///     // [(title: "Title 1", color: UIColor.blackColor(), textColor:UIColor.whiteColor()), (title: "Title 2", color: UIColor.redColor(), textColor:UIColor.whiteColor())]
+    ///
+    /// 4. ICButtonTitleWithFontTextAndBackgroundColor type:
+    ///     // [(title: "Title 1", font: UIFont.systemFontOfSize(22), textColor: UIColor.whiteColor(), color: UIColor.redColor())]
+    ///
+    /// Cell will recognise provided type automatically. All you need to worry about is the type that suits you best.
     public var buttonsTitles: [Any] = []
     
     ///  Buttons transiitons animation time. Default is 0.3, you can change it to whatever you like.
     public var animationDuration = 0.3
     
-    ///  Buttons resize themselfes to the size of the title, this property will be applide to left and right margin between the title and button side. Default value is 20.
-    public var buttonsSideMargins: CGFloat = 20.0
+    ///  Buttons resize themselfes to the size of the title, this property will be applide to left and right margin between the title and button side. Default value is 16.
+    public var buttonsSideMargins: CGFloat = 16.0
     
     /// The delegate that will respond to cell button touch up inside.
     public var delegate: ICSwipeActionsTableCellDelegate?
@@ -101,12 +109,13 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     // MARK: - ICSwipeActionsTableCell
 
     
-    /// Call this function to hide the buttons programmaticaly.
-    ///
-    /// :param: animated optional parameter to determint if the action should be animated or not. Default value is true.
+    /// Call this function to hide the buttons programmaticaly with animation. For non animated version use hideButtons(animated: Bool).
     func hideButtons() {
         self.hideButtons(true)
     }
+    /// Call this function to hide the buttons programmaticaly.
+    ///
+    /// :param: animated optional parameter to determint if the action should be animated or not. Default value is true.
     func hideButtons(animated: Bool) {
         if ( !_buttonsAreHiding) {
             let newContentViewCenter = CGPointMake(_initialContentViewCenter.x, self.contentView.center.y)
