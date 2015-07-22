@@ -115,17 +115,21 @@ public class ICSwipeActionsTableCell: UITableViewCell {
             _buttonsAreHiding = true
             removeTableOverlay()
             
+            func completition() {
+                self.removeButtonsView()
+                self.restoreTableSelection()
+                self.removeTapGestureRecognizer()
+            }
+            
             if animated {
                 UIView.animateWithDuration(animationDuration, delay: 0, options: .CurveEaseInOut, animations: { () -> Void in
                     self.contentView.center = newContentViewCenter
                     }) { (completed) -> Void in
-                        self.removeButtonsView()
-                        self.restoreTableSelection()
+                        completition()
                 }
             } else {
                 self.contentView.center = newContentViewCenter
-                removeButtonsView()
-                restoreTableSelection()
+                completition()
             }
         }
     }
@@ -148,7 +152,11 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         }
         
     }
-
+    
+    internal func viewTapped(tapRec: UITapGestureRecognizer) {
+        hideButtons()
+    }
+    
     internal func buttonTouchUpInside(sender: UIButton) {
         if delegate != nil {
             let indexPath = self.currentTableView()?.indexPathForCell(self)
@@ -164,10 +172,10 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     // MARK: - Setup
 
     private func setupEverythigng() {
-        self.addPanGestureRecogniser()
+        self.addPanGestureRecognizer()
     }
     
-    private func addPanGestureRecogniser() {
+    private func addPanGestureRecognizer() {
         _panRec = UIPanGestureRecognizer(target: self, action: "viewPanned:")
         if let validPan = _panRec {
             validPan.delegate = self
@@ -175,19 +183,34 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         }
     }
     
+    private func addTapGestureRecognizer() {
+        _tapRec = UITapGestureRecognizer(target: self, action: "viewTapped:")
+        if let validTap = _tapRec {
+            validTap.cancelsTouchesInView = true
+            validTap.delegate = self
+            self.addGestureRecognizer(validTap)
+        }
+    }
+    
+    private func removeTapGestureRecognizer() {
+        if _tapRec != nil {
+            self.removeGestureRecognizer(_tapRec!)
+            _tapRec = nil
+        }
+    }
     
     // MARK: - Button views
 
     private func addButtonsView() {
         if (_buttonsView != nil) {
-            self.removeButtonsView()
+            removeButtonsView()
         }
         _buttonsView = self.prepareButtonsView()
         _buttonsView?.frame = CGRectMake(self.contentView.frame.size.width, 0, _buttonsViewWidth, self.contentView.frame.size.height)
         _buttonsView?.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         _buttonsView?.backgroundColor = UIColor.redColor()
         self.contentView.addSubview(_buttonsView!)
-        self.addTableOverlay()
+        addTapGestureRecognizer()
     }
     
     private func prepareButtonsView() -> UIView {
@@ -273,9 +296,10 @@ public class ICSwipeActionsTableCell: UITableViewCell {
             UIView.animateWithDuration(animationDuration, delay: 0, options: .CurveEaseInOut, animations: { () -> Void in
                 self.contentView.center = newContentViewCenter
                 }) { (completed) -> Void in
+                    self.addTableOverlay()
             }
         } else {
-            self.hideButtons()
+            hideButtons()
         }
     }
     
@@ -307,7 +331,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         return true
     }
     
-
+    
     // MARK: - parent TableView
     
     private func currentTableView() -> UITableView? {
