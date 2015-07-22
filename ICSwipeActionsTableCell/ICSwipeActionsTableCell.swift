@@ -12,7 +12,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     
     // MARK: - properties
 
-    public var buttonsTitles = []
+    public var buttonsTitles: [Any] = []
     
     public var animationDuration = 0.3
     public var buttonsSideMargins: CGFloat = 20.0
@@ -126,11 +126,9 @@ public class ICSwipeActionsTableCell: UITableViewCell {
 
     func buttonTouchUpInside(sender: UIButton) {
         if delegate != nil {
-            if delegate!.respondsToSelector("swipeCellButtonPressedWithTitle::") {
-                let indexPath = self.currentTableView()?.indexPathForCell(self)
-                if indexPath != nil {
-                    self.delegate!.swipeCellButtonPressedWithTitle(sender.titleLabel!.text!, indexPath: indexPath!)
-                }
+            let indexPath = self.currentTableView()?.indexPathForCell(self)
+            if indexPath != nil {
+                self.delegate!.swipeCellButtonPressedWithTitle(sender.titleLabel!.text!, indexPath: indexPath!)
             }
         }
     }
@@ -171,7 +169,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     private func prepareButtonsView() -> UIView {
         if buttonsTitles.count > 0 {
             let view = UIView(frame: CGRectMake(0, 0, 0, self.contentView.frame.size.height))
-                
+            
             for buttonProperty in buttonsTitles {
                 let button = self.createButtonWith(buttonProperty)
                 button.frame = CGRectMake(view.frame.size.width, 0, button.frame.size.width + 2 * buttonsSideMargins, view.frame.size.height)
@@ -184,7 +182,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         return UIView()
     }
     
-    private func createButtonWith(buttonProperty: AnyObject) -> UIButton {
+    private func createButtonWith(buttonProperty: Any) -> UIButton {
         let buttonFullProperties = self.buttonsPropertiesFromObject(buttonProperty)
         let button = UIButton(type: .Custom)
         button.setTitle(buttonFullProperties.title, forState: .Normal)
@@ -192,10 +190,11 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         button.setTitleColor(buttonFullProperties.textColor, forState: .Normal)
         button.titleLabel?.font = buttonFullProperties.font
         button.sizeToFit()
+        button.addTarget(self, action: "buttonTouchUpInside:", forControlEvents: .TouchUpInside)
         return button
     }
     
-    private func buttonsPropertiesFromObject(buttonProperty: AnyObject) -> ICButtonTitleWithFontTextAndBackgroundColor {
+    private func buttonsPropertiesFromObject(buttonProperty: Any) -> ICButtonTitleWithFontTextAndBackgroundColor {
         var buttonTitle = ""
         var backgroundColor = self.anyColor()
         var titleColor = UIColor.whiteColor()
@@ -265,7 +264,22 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         panRec.setTranslation(CGPointZero, inView: self)
     }
     
+    public override func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
+        if (gestureRecognizer == _panRec) {
+            
+            if (self.editing) {
+                return false
+            }
+            
+            let translation = _panRec?.translationInView(self)
+            if (fabs(translation!.y) > fabs(translation!.x)) {
+                return false
+            }
+        }
+        return true
+    }
     
+
     // MARK: - parent TableView
     
     private func currentTableView() -> UITableView? {

@@ -1,12 +1,15 @@
 
 import UIKit
 
-class ICDemoTableViewController: UITableViewController {
+class ICDemoTableViewController: UITableViewController, ICSwipeActionsTableCellDelegate {
 
+    
     // MARK: - properties
     
-    let numberOfDemoCells = 5
-
+    var numberOfDemoCells = 10
+    
+    let deleteButtonTitle = "DELETE"
+    
     // MARK: - UIViewController
     
     override func viewDidLoad() {
@@ -16,7 +19,8 @@ class ICDemoTableViewController: UITableViewController {
         self.tableView.separatorColor = UIColor.whiteColor()
     }
 
-    // MARK:  -  - Table view data source
+    
+    // MARK: - Table view data source
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return numberOfDemoCells
@@ -27,7 +31,8 @@ class ICDemoTableViewController: UITableViewController {
         cell.backgroundColor = UIColor.purpleColor()
         cell.textLabel?.textColor = UIColor.whiteColor()
         cell.textLabel?.text = "\(indexPath.row)"
-        cell.buttonsTitles = ["title1", "title2"]
+        cell.buttonsTitles = [ (title:"OTHER", color:UIColor.blackColor()), (title:deleteButtonTitle, color:UIColor.redColor())]
+        cell.delegate = self
         return cell
     }
     
@@ -43,5 +48,17 @@ class ICDemoTableViewController: UITableViewController {
         let view = UIView(frame: CGRectMake(0, 0, tableView.frame.width, 20))
         view.backgroundColor = UIColor.whiteColor()
         return view
+    }
+    
+    // MARK: - ICSwipeActionsTableCellDelegate
+    
+    func swipeCellButtonPressedWithTitle(title: String, indexPath: NSIndexPath) {
+        if title == deleteButtonTitle {
+            numberOfDemoCells -= 1
+            self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Left)
+        } else {
+            numberOfDemoCells += 1
+            self.tableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: .Left)
+        }
     }
 }
