@@ -1,6 +1,9 @@
 
 import UIKit
 
+typealias ICButtonTitleWithColor = (title: String, color: UIColor)
+typealias ICButtonTitleWithFontTextAndBackgroundColor = (title: String, font: UIFont, textColor: UIColor, color: UIColor)
+
 public protocol ICSwipeActionsTableCellDelegate : NSObjectProtocol {
     func swipeCellButtonPressedWithTitle(title: String, indexPath: NSIndexPath)
 }
@@ -10,7 +13,9 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     // MARK: - properties
 
     public var buttonsTitles = []
+    
     public var animationDuration = 0.3
+    public var buttonsSideMargins: CGFloat = 20.0
     
     public var delegate: ICSwipeActionsTableCellDelegate?
 
@@ -51,6 +56,14 @@ public class ICSwipeActionsTableCell: UITableViewCell {
 
     public override func hitTest(point: CGPoint, withEvent event: UIEvent?) -> UIView? {
         _currentTouchInView = self.convertPoint(point, toView:self.contentView)
+        if _swipeExpanded {
+            if _buttonsView != nil {
+                let p = self.convertPoint(point, toView: _buttonsView)
+                if CGRectContainsPoint((_buttonsView?.bounds)!, p) {
+                    return _buttonsView?.hitTest(p, withEvent: event)
+                }
+            }
+        }
         return super.hitTest(point, withEvent: event)
     }
     
@@ -147,11 +160,65 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         if (_buttonsView != nil) {
             self.removeButtonsView()
         }
-        _buttonsView = UIView(frame: CGRectMake(self.contentView.frame.size.width, 0, _buttonsViewWidth, self.contentView.frame.size.height))
-        _buttonsView!.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-        _buttonsView!.backgroundColor = UIColor.redColor()
+        _buttonsView = self.prepareButtonsView()
+        _buttonsView?.frame = CGRectMake(self.contentView.frame.size.width, 0, _buttonsViewWidth, self.contentView.frame.size.height)
+        _buttonsView?.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        _buttonsView?.backgroundColor = UIColor.redColor()
         self.contentView.addSubview(_buttonsView!)
         self.addTableOverlay()
+    }
+    
+    private func prepareButtonsView() -> UIView {
+        if buttonsTitles.count > 0 {
+            let view = UIView(frame: CGRectMake(0, 0, 0, self.contentView.frame.size.height))
+                
+            for buttonProperty in buttonsTitles {
+                let button = self.createButtonWith(buttonProperty)
+                button.frame = CGRectMake(view.frame.size.width, 0, button.frame.size.width + 2 * buttonsSideMargins, view.frame.size.height)
+                view.frame = CGRectMake(0, 0, view.frame.size.width + button.frame.width, view.frame.size.height)
+                view.addSubview(button)
+            }
+            _buttonsViewWidth = view.frame.size.width
+            return view
+        }
+        return UIView()
+    }
+    
+    private func createButtonWith(buttonProperty: AnyObject) -> UIButton {
+        let buttonFullProperties = self.buttonsPropertiesFromObject(buttonProperty)
+        let button = UIButton(type: .Custom)
+        button.setTitle(buttonFullProperties.title, forState: .Normal)
+        button.backgroundColor = buttonFullProperties.color
+        button.setTitleColor(buttonFullProperties.textColor, forState: .Normal)
+        button.titleLabel?.font = buttonFullProperties.font
+        button.sizeToFit()
+        return button
+    }
+    
+    private func buttonsPropertiesFromObject(buttonProperty: AnyObject) -> ICButtonTitleWithFontTextAndBackgroundColor {
+        var buttonTitle = ""
+        var backgroundColor = self.anyColor()
+        var titleColor = UIColor.whiteColor()
+        var titleFont = UIFont.systemFontOfSize(15.0)
+        if let stringTitle = buttonProperty as? String {
+            buttonTitle = stringTitle
+        } else if let colorTouple = buttonProperty as? ICButtonTitleWithColor {
+            buttonTitle = colorTouple.title
+            backgroundColor = colorTouple.color
+        } else if let colorAndTitleAttrsTouple = buttonProperty as? ICButtonTitleWithFontTextAndBackgroundColor {
+            buttonTitle = colorAndTitleAttrsTouple.title
+            backgroundColor = colorAndTitleAttrsTouple.color
+            titleFont = colorAndTitleAttrsTouple.font
+            titleColor = colorAndTitleAttrsTouple.textColor
+        }
+        return (title: buttonTitle, font: titleFont, textColor: titleColor, color: backgroundColor)
+    }
+    
+    private func anyColor() -> UIColor {
+        let hue:CGFloat = (CGFloat)( arc4random() % 256 ) / 256.0  //  0.0 to 1.0
+        let saturation:CGFloat = (CGFloat)( arc4random() % 128 ) / 256.0  //  0.0 to 1.0
+        let brightness:CGFloat = (CGFloat)( arc4random() % 128 ) / 256.0  + 0.5 //  0.0 to 1.0
+        return UIColor(hue: hue, saturation: saturation, brightness: brightness, alpha: 1)
     }
     
     private func removeButtonsView() {
@@ -199,7 +266,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     }
     
     
-    // MARK: - 
+    // MARK: - parent TableView
     
     private func currentTableView() -> UITableView? {
         if (_currentTableView == nil) {
@@ -213,19 +280,6 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         }
         return _currentTableView
     }
-    
-    public override func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
-        if gestureRecognizer == _tapRec {
-            let tapLocation = gestureRecognizer.locationInView(_currentTableViewOverlay)
-            if let _ = _buttonsView {
-                if CGRectContainsPoint(_buttonsView!.frame, tapLocation) {
-                    return false
-                }
-            }
-        }
-        return true
-    }
-    
     
     // MARK: - Table view overlay
     

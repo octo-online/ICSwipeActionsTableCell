@@ -23,10 +23,11 @@ class ICDemoTableViewController: UITableViewController {
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(ICDemoTableViewCellIdentifier, forIndexPath: indexPath)
+        let cell = tableView.dequeueReusableCellWithIdentifier(ICDemoTableViewCellIdentifier, forIndexPath: indexPath) as! ICDemoTableViewCell
         cell.backgroundColor = UIColor.purpleColor()
         cell.textLabel?.textColor = UIColor.whiteColor()
         cell.textLabel?.text = "\(indexPath.row)"
+        cell.buttonsTitles = ["title1", "title2"]
         return cell
     }
     
