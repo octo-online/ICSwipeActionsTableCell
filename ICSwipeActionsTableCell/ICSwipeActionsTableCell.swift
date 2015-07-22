@@ -117,30 +117,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     ///
     /// :param: animated optional parameter to determint if the action should be animated or not. Default value is true.
     func hideButtons(animated: Bool) {
-        if ( !_buttonsAreHiding) {
-            let newContentViewCenter = CGPointMake(_initialContentViewCenter.x, self.contentView.center.y)
-            _currentContentViewCenter = newContentViewCenter
-            _swipeExpanded = false
-            _buttonsAreHiding = true
-            removeTableOverlay()
-            
-            func completition() {
-                self.removeButtonsView()
-                self.restoreTableSelection()
-                self.removeTapGestureRecognizer()
-            }
-            
-            if animated {
-                UIView.animateWithDuration(animationDuration, delay: 0, options: .CurveEaseInOut, animations: { () -> Void in
-                    self.contentView.center = newContentViewCenter
-                    }) { (completed) -> Void in
-                        completition()
-                }
-            } else {
-                self.contentView.center = newContentViewCenter
-                completition()
-            }
-        }
+        hideButtonsAnimated(animated, velocity: CGPointZero)
     }
     
 
@@ -286,6 +263,43 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         _buttonsAreHiding = false
     }
     
+    func hideButtonsAnimated(animated: Bool, velocity: CGPoint) {
+        if ( !_buttonsAreHiding) {
+            let newContentViewCenter = CGPointMake(_initialContentViewCenter.x, self.contentView.center.y)
+            _currentContentViewCenter = newContentViewCenter
+            _swipeExpanded = false
+            _buttonsAreHiding = true
+            removeTableOverlay()
+            
+            func completition() {
+                self.removeButtonsView()
+                self.restoreTableSelection()
+                self.removeTapGestureRecognizer()
+            }
+            
+            if animated {
+                var hideAnimationDuration = animationDuration
+                if velocity != CGPointZero {
+                    let currentDelta: Double = Double(_initialContentViewCenter.x) - Double(self.contentView.center.x)
+                    let xVelocity: Double = Double(velocity.x)
+                    hideAnimationDuration = currentDelta / xVelocity
+                    if hideAnimationDuration < 0.0 || hideAnimationDuration > animationDuration {
+                        hideAnimationDuration = animationDuration
+                    }
+                }
+                UIView.animateWithDuration(hideAnimationDuration, delay: 0, options: .CurveEaseInOut, animations: { () -> Void in
+                    self.contentView.center = newContentViewCenter
+                    }) { (completed) -> Void in
+                        completition()
+                }
+            } else {
+                self.contentView.center = newContentViewCenter
+                completition()
+            }
+        }
+    }
+
+    
     // MARK: - GestureHandlers
 
     private func handleLeftPanGestureBegan() {
@@ -308,7 +322,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
                     self.addTableOverlay()
             }
         } else {
-            hideButtons()
+            hideButtonsAnimated(true, velocity: velocity)
         }
     }
     
