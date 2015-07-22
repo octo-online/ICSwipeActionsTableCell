@@ -11,7 +11,10 @@ public class ICSwipeActionsTableCell: UITableViewCell {
 
     /// Tuple type with title string and background color.
     typealias ICButtonTitleWithColor = (title: String, color: UIColor)
-
+    
+    /// Tuple type with title string, title and background color.
+    typealias ICButtonTitleWithTextAndBackgroundColor = (title: String, color: UIColor, textColor: UIColor)
+    
     /// Tuple type with title string, title font, title and background color.
     typealias ICButtonTitleWithFontTextAndBackgroundColor = (title: String, font: UIFont, textColor: UIColor, color: UIColor)
     
@@ -225,6 +228,10 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         } else if let colorTouple = buttonProperty as? ICButtonTitleWithColor {
             buttonTitle = colorTouple.title
             backgroundColor = colorTouple.color
+        } else if let colorAndTextTouple = buttonProperty as? ICButtonTitleWithTextAndBackgroundColor {
+            buttonTitle = colorAndTextTouple.title
+            backgroundColor = colorAndTextTouple.color
+            titleColor = colorAndTextTouple.textColor
         } else if let colorAndTitleAttrsTouple = buttonProperty as? ICButtonTitleWithFontTextAndBackgroundColor {
             buttonTitle = colorAndTitleAttrsTouple.title
             backgroundColor = colorAndTitleAttrsTouple.color
@@ -321,8 +328,10 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         let myIndexPath = tableView?.indexPathForCell(self)
         if myIndexPath != nil {
             let selectedRows = tableView?.indexPathsForSelectedRows
-            if (selectedRows?.contains(myIndexPath!) != nil) {
-                self.selected = true
+            if selectedRows != nil {
+                if selectedRows!.contains(myIndexPath!) {
+                    self.selected = true
+                }
             }
         }
     }
