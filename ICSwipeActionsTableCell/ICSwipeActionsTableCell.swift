@@ -1,22 +1,38 @@
 
 import UIKit
 
-typealias ICButtonTitleWithColor = (title: String, color: UIColor)
-typealias ICButtonTitleWithFontTextAndBackgroundColor = (title: String, font: UIFont, textColor: UIColor, color: UIColor)
-
 public protocol ICSwipeActionsTableCellDelegate : NSObjectProtocol {
     func swipeCellButtonPressedWithTitle(title: String, indexPath: NSIndexPath)
 }
 
 public class ICSwipeActionsTableCell: UITableViewCell {
     
+    // MARK: - types
+
+    /// Tuple type with title string and background color.
+    typealias ICButtonTitleWithColor = (title: String, color: UIColor)
+
+    /// Tuple type with title string, title font, title and background color.
+    typealias ICButtonTitleWithFontTextAndBackgroundColor = (title: String, font: UIFont, textColor: UIColor, color: UIColor)
+    
     // MARK: - properties
 
+    /**
+        Array of button title properties, this can be one of three types: 
+        - Plain string ex. ["Title 1", "Title 2"]
+        - ICButtonTitleWithColor type ex. [(title: "Title 1", color: UIColor.blackColor()), (title: "Title 2", color: UIColor.redColor())]
+        - ICButtonTitleWithFontTextAndBackgroundColor type ex. [(title: "Title 1", font: UIFont.systemFontOfSize(22), textColor: UIColor.whiteColor(), color: UIColor.redColor())]
+        Cell will recognise provided type automatically. All you need to worry about is the type that suits you best.
+    */
     public var buttonsTitles: [Any] = []
     
+    ///  Buttons transiitons animation time. Default is 0.3, you can change it to whatever you like.
     public var animationDuration = 0.3
+    
+    ///  Buttons resize themselfes to the size of the title, this property will be applide to left and right margin between the title and button side. Default value is 20.
     public var buttonsSideMargins: CGFloat = 20.0
     
+    /// The delegate that will respond to cell button touch up inside.
     public var delegate: ICSwipeActionsTableCellDelegate?
 
     // MARK: - private properties
@@ -81,6 +97,10 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     
     // MARK: - ICSwipeActionsTableCell
 
+    
+    /// Call this function to hide the buttons programmaticaly.
+    ///
+    /// :param: animated optional parameter to determint if the action should be animated or not. Default value is true.
     func hideButtons() {
         self.hideButtons(true)
     }
@@ -90,17 +110,19 @@ public class ICSwipeActionsTableCell: UITableViewCell {
             _currentContentViewCenter = newContentViewCenter
             _swipeExpanded = false
             _buttonsAreHiding = true
-            self.removeTableOverlay()
+            removeTableOverlay()
             
             if animated {
                 UIView.animateWithDuration(animationDuration, delay: 0, options: .CurveEaseInOut, animations: { () -> Void in
                     self.contentView.center = newContentViewCenter
                     }) { (completed) -> Void in
                         self.removeButtonsView()
+                        self.restoreTableSelection()
                 }
             } else {
                 self.contentView.center = newContentViewCenter
-                self.removeButtonsView()
+                removeButtonsView()
+                restoreTableSelection()
             }
         }
     }
@@ -124,7 +146,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         
     }
 
-    func buttonTouchUpInside(sender: UIButton) {
+    internal func buttonTouchUpInside(sender: UIButton) {
         if delegate != nil {
             let indexPath = self.currentTableView()?.indexPathForCell(self)
             if indexPath != nil {
@@ -135,7 +157,6 @@ public class ICSwipeActionsTableCell: UITableViewCell {
 
     
     // MARK: - ICSwipeActionsTableCell ()
-    
     
     // MARK: - Setup
 
@@ -293,6 +314,17 @@ public class ICSwipeActionsTableCell: UITableViewCell {
             }
         }
         return _currentTableView
+    }
+    
+    private func restoreTableSelection() {
+        let tableView = currentTableView()
+        let myIndexPath = tableView?.indexPathForCell(self)
+        if myIndexPath != nil {
+            let selectedRows = tableView?.indexPathsForSelectedRows
+            if (selectedRows?.contains(myIndexPath!) != nil) {
+                self.selected = true
+            }
+        }
     }
     
     // MARK: - Table view overlay

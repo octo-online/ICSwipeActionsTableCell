@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		45B7D19E1B5FA748002BF7B4 /* ICDemoTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 45B7D19D1B5FA748002BF7B4 /* ICDemoTableViewCell.xib */; };
 		45E349E11B5E47FB0033FA0D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45E349E01B5E47FB0033FA0D /* AppDelegate.swift */; };
 		45E349E81B5E47FB0033FA0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 45E349E71B5E47FB0033FA0D /* Assets.xcassets */; };
 		45E349EB1B5E47FB0033FA0D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 45E349E91B5E47FB0033FA0D /* LaunchScreen.storyboard */; };
@@ -35,6 +36,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		45B7D19D1B5FA748002BF7B4 /* ICDemoTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ICDemoTableViewCell.xib; sourceTree = "<group>"; };
 		45E349DD1B5E47FB0033FA0D /* ICSwipeActionsTableCell.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ICSwipeActionsTableCell.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		45E349E01B5E47FB0033FA0D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		45E349E71B5E47FB0033FA0D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -102,6 +104,7 @@
 				45E349E01B5E47FB0033FA0D /* AppDelegate.swift */,
 				45E34A0E1B5E481A0033FA0D /* ICDemoTableViewController.swift */,
 				45E34A101B5E48310033FA0D /* ICDemoTableViewCell.swift */,
+				45B7D19D1B5FA748002BF7B4 /* ICDemoTableViewCell.xib */,
 				45E34A121B5E483D0033FA0D /* ICSwipeActionsTableCell.swift */,
 				45E349E71B5E47FB0033FA0D /* Assets.xcassets */,
 				45E349E91B5E47FB0033FA0D /* LaunchScreen.storyboard */,
@@ -233,6 +236,7 @@
 			files = (
 				45E349EB1B5E47FB0033FA0D /* LaunchScreen.storyboard in Resources */,
 				45E349E81B5E47FB0033FA0D /* Assets.xcassets in Resources */,
+				45B7D19E1B5FA748002BF7B4 /* ICDemoTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -479,6 +483,7 @@
 				45E34A071B5E47FB0033FA0D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		45E34A081B5E47FB0033FA0D /* Build configuration list for PBXNativeTarget "ICSwipeActionsTableCellTests" */ = {
 			isa = XCConfigurationList;
@@ -487,6 +492,7 @@
 				45E34A0A1B5E47FB0033FA0D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		45E34A0B1B5E47FB0033FA0D /* Build configuration list for PBXNativeTarget "ICSwipeActionsTableCellUITests" */ = {
 			isa = XCConfigurationList;
@@ -495,6 +501,7 @@
 				45E34A0D1B5E47FB0033FA0D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

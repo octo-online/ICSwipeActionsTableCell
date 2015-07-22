@@ -16,6 +16,7 @@ class ICDemoTableViewController: UITableViewController, ICSwipeActionsTableCellD
         super.viewDidLoad()
         
         self.tableView.registerClass(ICDemoTableViewCell.self, forCellReuseIdentifier: ICDemoTableViewCellIdentifier)
+        self.tableView.registerNib(UINib(nibName: "ICDemoTableViewCell", bundle: NSBundle.mainBundle()), forCellReuseIdentifier: ICDemoTableViewCellIdentifier)
         self.tableView.separatorColor = UIColor.whiteColor()
     }
 
@@ -28,9 +29,7 @@ class ICDemoTableViewController: UITableViewController, ICSwipeActionsTableCellD
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(ICDemoTableViewCellIdentifier, forIndexPath: indexPath) as! ICDemoTableViewCell
-        cell.backgroundColor = UIColor.purpleColor()
-        cell.textLabel?.textColor = UIColor.whiteColor()
-        cell.textLabel?.text = "\(indexPath.row)"
+        cell.indexPathLabel.text = "\(indexPath.row)"
         cell.buttonsTitles = [ (title:"OTHER", color:UIColor.blackColor()), (title:deleteButtonTitle, color:UIColor.redColor())]
         cell.delegate = self
         return cell
