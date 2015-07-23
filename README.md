@@ -5,13 +5,13 @@
 This is a simple Swift class that lets you add as many additional buttons to a table view cell as you like :-)
 It's written in Swift 2.0 and takes full advantage of it's features, making it super simple tu use.
 
-Here are teh steps:
+Here are the steps:
 
 ## Install with CocoaPods or Carthage
 
-[CocoaPods](http://cocoapods.org) 
+###[CocoaPods](http://cocoapods.org) 
 
-### Podfile
+Podfile
 
 ```ruby
 use_frameworks!
@@ -19,12 +19,12 @@ use_frameworks!
 pod 'ICSwipeActionsTableCell'
 ```
 
-[Carthage](https://github.com/Carthage/Carthage) 
+###[Carthage](https://github.com/Carthage/Carthage) 
 
 Add the following line to your Cartfile:
 
 ```
-github "imaginary-cloud/ICSwipeActionsTableCell" >= 1.0
+github "imaginary-cloud/ICSwipeActionsTableCell" >= 0.1
 ```
 And run `carthage update` to build the dynamic framework.
 
@@ -58,6 +58,13 @@ You can also change default buttons side margins
 ```swift
 cell.buttonsSideMargins = 5
 ```
+
+If you want all buttons to be the same width, set buttonsEqualSize flag true.
+```swift
+cell.buttonsEqualSize = true
+```
+
+http://i.imgur.com/5T9TNqp.png
 
 Stay tuned! This library is not left here on it's own. More features and customisations will come! Please submit issues with you suggestions :-)
 

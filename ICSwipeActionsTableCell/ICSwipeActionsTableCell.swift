@@ -43,6 +43,9 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     ///  Buttons resize themselfes to the size of the title, this property will be applide to left and right margin between the title and button side. Default value is 16.
     public var buttonsSideMargins: CGFloat = 16.0
     
+    ///  Flag indicating if the buttons should all be sized according to the biggest one. Default is no, meaning that every button will be the size of it's title.
+    public var buttonsEqualSize = false
+    
     /// The delegate that will respond to cell button touch up inside.
     public var delegate: ICSwipeActionsTableCellDelegate?
 
@@ -202,12 +205,22 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     private func prepareButtonsView() -> UIView {
         if buttonsTitles.count > 0 {
             let view = UIView(frame: CGRectMake(0, 0, 0, self.contentView.frame.size.height))
+            var maxButtonsWidth: CGFloat = 0
             
             for buttonProperty in buttonsTitles {
                 let button = self.createButtonWith(buttonProperty)
                 button.frame = CGRectMake(view.frame.size.width, 0, button.frame.size.width + 2 * buttonsSideMargins, view.frame.size.height)
                 view.frame = CGRectMake(0, 0, view.frame.size.width + button.frame.width, view.frame.size.height)
                 view.addSubview(button)
+                maxButtonsWidth = max(maxButtonsWidth, button.frame.width)
+            }
+            if buttonsEqualSize {
+                view.frame = CGRectMake(0, 0, maxButtonsWidth * CGFloat(buttonsTitles.count), view.frame.size.height)
+                var currentX: CGFloat = 0
+                for button in view.subviews {
+                    button.frame = CGRectMake(currentX, 0, maxButtonsWidth, view.frame.size.height)
+                    currentX += maxButtonsWidth
+                }
             }
             _buttonsViewWidth = view.frame.size.width
             return view

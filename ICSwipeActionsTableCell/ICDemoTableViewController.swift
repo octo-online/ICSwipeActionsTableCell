@@ -9,7 +9,7 @@ class ICDemoTableViewController: UITableViewController, ICSwipeActionsTableCellD
     var numberOfDemoCells = 10
     
     let moreButtonTitle = "MORE"
-    let deleteButtonTitle = "DELETE"
+    let deleteButtonTitle = "DELETE THIS"
     
     // MARK: - UIViewController
     
@@ -34,6 +34,7 @@ class ICDemoTableViewController: UITableViewController, ICSwipeActionsTableCellD
         let textColor = UIColor(red: 1.0, green: 1.0, blue: 102.0/255.0, alpha: 1.0)
         cell.buttonsTitles = [(title:moreButtonTitle, color:UIColor(red: 128.0/255.0, green: 0.0, blue: 128.0/255.0, alpha: 1.0), textColor:textColor), (title:deleteButtonTitle, color:UIColor(red: 1.0, green: 0.0, blue: 128.0/255.0, alpha: 1.0), textColor:textColor)]
         cell.delegate = self
+        cell.buttonsEqualSize = true
         return cell
     }
     
