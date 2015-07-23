@@ -33,7 +33,7 @@ class ICDemoTableViewController: UITableViewController, ICSwipeActionsTableCellD
         cell.indexPathLabel.text = "\(indexPath.row)"
         let textColor = UIColor(red: 1.0, green: 1.0, blue: 102.0/255.0, alpha: 1.0)
         cell.rightButtonsTitles = [(title:moreButtonTitle, color:UIColor(red: 128.0/255.0, green: 0.0, blue: 128.0/255.0, alpha: 1.0), textColor:textColor), (title:deleteButtonTitle, color:UIColor(red: 1.0, green: 0.0, blue: 128.0/255.0, alpha: 1.0), textColor:textColor)]
-        cell.leftButtonsTitles = [(title:"FROG", color:UIColor.greenColor()), (title:"LION", color:UIColor.orangeColor())]
+        cell.leftButtonsTitles = [(title:"FROG", color:UIColor(red: 128.0/255.0, green: 1.0, blue: 0.0, alpha: 1.0), textColor:textColor), (title:"LION", color:UIColor(red: 1.0, green: 128.0/255.0, blue: 0.0, alpha: 1.0), textColor:textColor)]
         cell.delegate = self
         cell.buttonsEqualSize = true
         return cell
