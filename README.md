@@ -5,6 +5,8 @@
 This is a simple Swift class that lets you add as many additional buttons to a table view cell as you like :-)
 It's written in Swift 2.0 and takes full advantage of it's features, making it super simple tu use.
 
+![alt tag](http://cdn.makeagif.com/media/7-22-2015/v3DVWz.gif)
+
 Here are the steps:
 
 ## Install with CocoaPods or Carthage
