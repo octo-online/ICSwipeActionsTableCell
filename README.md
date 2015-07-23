@@ -63,8 +63,7 @@ If you want all buttons to be the same width, set buttonsEqualSize flag true.
 ```swift
 cell.buttonsEqualSize = true
 ```
-
-http://i.imgur.com/5T9TNqp.png
+![alt tag](http://i.imgur.com/5T9TNqp.png)
 
 Stay tuned! This library is not left here on it's own. More features and customisations will come! Please submit issues with you suggestions :-)
 
