@@ -23,10 +23,10 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     
     /// Array of button title properties that will be displayed on the right, this can be one of four types:
     /// 1. Plain string:
-    ///     // cell.buttonsTitles = ["Title 1", "Title 2"]
+    ///     // cell.rightButtonsTitles = ["Title 1", "Title 2"]
     ///
     /// 2. ICButtonTitleWithColor type:
-    ///     // cell.buttonsTitles = [(title: "Title 1", color: UIColor.blackColor()), (title: "Title 2", color: UIColor.redColor())]
+    ///     // cell.rightButtonsTitles = [(title: "Title 1", color: UIColor.blackColor()), (title: "Title 2", color: UIColor.redColor())]
     ///
     /// 3. ICButtonTitleWithTextAndBackgroundColor type:
     ///     // [(title: "Title 1", color: UIColor.blackColor(), textColor:UIColor.whiteColor()), (title: "Title 2", color: UIColor.redColor(), textColor:UIColor.whiteColor())]
@@ -39,10 +39,10 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     
     /// Array of button title properties that will be displayed on the left, this can be one of four types:
     /// 1. Plain string:
-    ///     // cell.buttonsTitles = ["Title 1", "Title 2"]
+    ///     // cell.leftButtonsTitles = ["Title 1", "Title 2"]
     ///
     /// 2. ICButtonTitleWithColor type:
-    ///     // cell.buttonsTitles = [(title: "Title 1", color: UIColor.blackColor()), (title: "Title 2", color: UIColor.redColor())]
+    ///     // cell.leftButtonsTitles = [(title: "Title 1", color: UIColor.blackColor()), (title: "Title 2", color: UIColor.redColor())]
     ///
     /// 3. ICButtonTitleWithTextAndBackgroundColor type:
     ///     // [(title: "Title 1", color: UIColor.blackColor(), textColor:UIColor.whiteColor()), (title: "Title 2", color: UIColor.redColor(), textColor:UIColor.whiteColor())]
@@ -229,7 +229,6 @@ public class ICSwipeActionsTableCell: UITableViewCell {
             _leftButtonsView?.frame = CGRectMake(-_leftButtonsViewWidth, 0, _leftButtonsViewWidth, self.contentView.frame.size.height)
             _leftButtonsView?.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
             self.contentView.addSubview(_leftButtonsView!)
-            addTapGestureRecognizer()
         }
     }
     
@@ -243,8 +242,14 @@ public class ICSwipeActionsTableCell: UITableViewCell {
             _rightButtonsView?.frame = CGRectMake(self.contentView.frame.size.width, 0, _rightButtonsViewWidth, self.contentView.frame.size.height)
             _rightButtonsView?.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
             self.contentView.addSubview(_rightButtonsView!)
-            addTapGestureRecognizer()
         }
+    }
+    
+    private func addButtonViews() {
+        unselect()
+        addRightButtonsView()
+        addLeftButtonsView()
+        addTapGestureRecognizer()
     }
     
     private func prepareButtonsView(buttonsTitles: [Any]) -> UIView {
@@ -372,8 +377,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
             
         } else {
             if rightButtonsTitles.count > 0 {
-                unselect()
-                addRightButtonsView()
+                addButtonViews()
                 _rightSwipeExpanded = true
             }
         }
@@ -384,8 +388,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
             
         } else {
             if leftButtonsTitles.count > 0 {
-                unselect()
-                addLeftButtonsView()
+                addButtonViews()
                 _leftSwipeExpanded = true
             }
         }
@@ -432,6 +435,13 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         if (panIsWithinLeftMotionRange && panIsWithinRightMotionRange) { // no more then buttons width
             self.contentView.center = newCenter
             _currentContentViewCenter = newCenter
+            if _leftSwipeExpanded && (newCenter.x - _initialContentViewCenter.x) < 0 { // view changed from left to right expansion
+                _leftSwipeExpanded = false
+                _rightSwipeExpanded = true
+            } else if _rightSwipeExpanded && ( _initialContentViewCenter.x - newCenter.x) < 0 {
+                _rightSwipeExpanded = false
+                _leftSwipeExpanded = true
+            }
         }
         panRec.setTranslation(CGPointZero, inView: self)
     }

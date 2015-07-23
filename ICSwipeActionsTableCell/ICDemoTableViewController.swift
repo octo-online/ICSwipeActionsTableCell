@@ -9,7 +9,7 @@ class ICDemoTableViewController: UITableViewController, ICSwipeActionsTableCellD
     var numberOfDemoCells = 10
     
     let moreButtonTitle = "MORE"
-    let deleteButtonTitle = "DELETE THIS"
+    let deleteButtonTitle = "DELETE"
     
     // MARK: - UIViewController
     
@@ -32,8 +32,8 @@ class ICDemoTableViewController: UITableViewController, ICSwipeActionsTableCellD
         let cell = tableView.dequeueReusableCellWithIdentifier(ICDemoTableViewCellIdentifier, forIndexPath: indexPath) as! ICDemoTableViewCell
         cell.indexPathLabel.text = "\(indexPath.row)"
         let textColor = UIColor(red: 1.0, green: 1.0, blue: 102.0/255.0, alpha: 1.0)
-        cell.leftButtonsTitles = [(title:moreButtonTitle, color:UIColor(red: 128.0/255.0, green: 0.0, blue: 128.0/255.0, alpha: 1.0), textColor:textColor), (title:deleteButtonTitle, color:UIColor(red: 1.0, green: 0.0, blue: 128.0/255.0, alpha: 1.0), textColor:textColor)]
-        cell.rightButtonsTitles = cell.leftButtonsTitles
+        cell.rightButtonsTitles = [(title:moreButtonTitle, color:UIColor(red: 128.0/255.0, green: 0.0, blue: 128.0/255.0, alpha: 1.0), textColor:textColor), (title:deleteButtonTitle, color:UIColor(red: 1.0, green: 0.0, blue: 128.0/255.0, alpha: 1.0), textColor:textColor)]
+        cell.leftButtonsTitles = [(title:"FROG", color:UIColor.greenColor()), (title:"LION", color:UIColor.orangeColor())]
         cell.delegate = self
         cell.buttonsEqualSize = true
         return cell
