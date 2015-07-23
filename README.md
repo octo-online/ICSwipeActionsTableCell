@@ -50,6 +50,8 @@ cell.delegate = self
 
 You're done with the basic setup, but if you want more then that you can go much further:
 
+## Customisations
+
 It uses differen tuple types to set multiple parameters on the buttons for ex:
 ```swift
 cell.rightButtonsTitles = [(title:"FROG", color:UIColor.greenColor(), textColor:UIColor.whiteColor())] 
