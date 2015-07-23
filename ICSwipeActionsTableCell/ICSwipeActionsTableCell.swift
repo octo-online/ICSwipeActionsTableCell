@@ -418,10 +418,11 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         }
         if newContentViewCenter != CGPointZero {
             _currentContentViewCenter = newContentViewCenter
+            self.addTableOverlay()
+
             UIView.animateWithDuration(animationDuration, delay: 0, options: .CurveEaseInOut, animations: { () -> Void in
                 self.contentView.center = newContentViewCenter
                 }) { (completed) -> Void in
-                    self.addTableOverlay()
             }
         }
     }

@@ -5,7 +5,7 @@
 This is a simple Swift class that lets you add as many additional buttons to a table view cell as you like :-)
 It's written in Swift 2.0 and takes full advantage of it's features, making it super simple tu use. Checkout the demo app to see how it works. And below are the steps needed to add it to your project.
 
-![alt tag](http://cdn.makeagif.com/media/7-22-2015/v3DVWz.gif)
+![alt tag](http://cdn.makeagif.com/media/7-23-2015/fDk0tl.gif)
 
 Here are the steps:
 
@@ -37,9 +37,10 @@ You just subclass you own cell with ICSwipeActionsTableCell:
 class ICDemoTableViewCell: ICSwipeActionsTableCell
 ```
 
-Provide the button titles you want to show:
+Provide the button titles you want to show (there are right buttons and left buttons options available):
 ```swift
-cell.buttonsTitles = ["MORE", "DELETE"] 
+cell.rightButtonsTitles = ["MORE", "DELETE"] 
+cell.leftButtonsTitles = ["MORE", "DELETE"] 
 ```
 
 And the delegate to forward the calbacks:
@@ -51,8 +52,8 @@ You're done with the basic setup, but if you want more then that you can go much
 
 It uses differen tuple types to set multiple parameters on the buttons for ex:
 ```swift
-cell.buttonsTitles = [(title:"FROG", color:UIColor.greenColor(), textColor:UIColor.whiteColor())] 
-cell.buttonsTitles = [(title:"FROG", color:UIColor.greenColor()), (title:"LION", color:UIColor.yellowColor())] 
+cell.rightButtonsTitles = [(title:"FROG", color:UIColor.greenColor(), textColor:UIColor.whiteColor())] 
+cell.leftButtonsTitles = [(title:"FROG", color:UIColor.greenColor()), (title:"LION", color:UIColor.yellowColor())] 
 ```
 It'll automatically check for the provided type so all you have to worry about is choosing one you like.
 
