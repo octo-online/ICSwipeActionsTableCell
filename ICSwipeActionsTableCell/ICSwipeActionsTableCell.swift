@@ -21,7 +21,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     // MARK: - properties
 
     
-    /// Array of button title properties, this can be one of three types:
+    /// Array of button title properties that will be displayed on the right, this can be one of four types:
     /// 1. Plain string:
     ///     // cell.buttonsTitles = ["Title 1", "Title 2"]
     ///
@@ -35,7 +35,23 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     ///     // [(title: "Title 1", font: UIFont.systemFontOfSize(22), textColor: UIColor.whiteColor(), color: UIColor.redColor())]
     ///
     /// Cell will recognise provided type automatically. All you need to worry about is the type that suits you best.
-    public var buttonsTitles: [Any] = []
+    public var rightButtonsTitles: [Any] = []
+    
+    /// Array of button title properties that will be displayed on the left, this can be one of four types:
+    /// 1. Plain string:
+    ///     // cell.buttonsTitles = ["Title 1", "Title 2"]
+    ///
+    /// 2. ICButtonTitleWithColor type:
+    ///     // cell.buttonsTitles = [(title: "Title 1", color: UIColor.blackColor()), (title: "Title 2", color: UIColor.redColor())]
+    ///
+    /// 3. ICButtonTitleWithTextAndBackgroundColor type:
+    ///     // [(title: "Title 1", color: UIColor.blackColor(), textColor:UIColor.whiteColor()), (title: "Title 2", color: UIColor.redColor(), textColor:UIColor.whiteColor())]
+    ///
+    /// 4. ICButtonTitleWithFontTextAndBackgroundColor type:
+    ///     // [(title: "Title 1", font: UIFont.systemFontOfSize(22), textColor: UIColor.whiteColor(), color: UIColor.redColor())]
+    ///
+    /// Cell will recognise provided type automatically. All you need to worry about is the type that suits you best.
+    public var leftButtonsTitles: [Any] = []
     
     ///  Buttons transiitons animation time. Default is 0.3, you can change it to whatever you like.
     public var animationDuration = 0.3
@@ -46,7 +62,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     ///  Flag indicating if the buttons should all be sized according to the biggest one. Default is no, meaning that every button will be the size of it's title.
     public var buttonsEqualSize = false
     
-    /// The delegate that will respond to cell button touch up inside.
+    /// The delegate that will respond to cell action callbacks.
     public var delegate: ICSwipeActionsTableCellDelegate?
 
     // MARK: - private properties
@@ -57,9 +73,12 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     private var _initialContentViewCenter = CGPointZero
     private var _currentContentViewCenter = CGPointZero
     
-    private var _buttonsView: UIView?
-    private var _buttonsViewWidth: CGFloat = 200.0
-    private var _swipeExpanded = false
+    private var _rightButtonsView: UIView?
+    private var _rightButtonsViewWidth: CGFloat = 0.0
+    private var _rightSwipeExpanded = false
+    private var _leftButtonsView: UIView?
+    private var _leftButtonsViewWidth: CGFloat = 0.0
+    private var _leftSwipeExpanded = false
     private var _buttonsAreHiding = false
     
     private var _currentTouchInView = CGPointZero
@@ -70,11 +89,11 @@ public class ICSwipeActionsTableCell: UITableViewCell {
 
     required public init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        self.setupEverythigng()
+        setupEverythigng()
     }
 
     deinit {
-        self.removeTableOverlay()
+        removeTableOverlay()
     }
     
     // MARK: - UIView
@@ -86,11 +105,16 @@ public class ICSwipeActionsTableCell: UITableViewCell {
 
     public override func hitTest(point: CGPoint, withEvent event: UIEvent?) -> UIView? {
         _currentTouchInView = self.convertPoint(point, toView:self.contentView)
-        if _swipeExpanded {
-            if _buttonsView != nil {
-                let p = self.convertPoint(point, toView: _buttonsView)
-                if CGRectContainsPoint((_buttonsView?.bounds)!, p) {
-                    return _buttonsView?.hitTest(p, withEvent: event)
+        if _leftSwipeExpanded || _rightSwipeExpanded {
+            if _rightButtonsView != nil {
+                let p = self.convertPoint(point, toView: _rightButtonsView)
+                if CGRectContainsPoint((_rightButtonsView?.bounds)!, p) {
+                    return _rightButtonsView?.hitTest(p, withEvent: event)
+                }
+            } else if _leftButtonsView != nil {
+                let p = self.convertPoint(point, toView: _leftButtonsView)
+                if CGRectContainsPoint((_leftButtonsView?.bounds)!, p) {
+                    return _leftButtonsView?.hitTest(p, withEvent: event)
                 }
             }
         }
@@ -98,14 +122,14 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     }
     
     public override func willMoveToSuperview(newSuperview: UIView?) {
-        self.removeTableOverlay()
+        removeTableOverlay()
     }
     
     // MARK: - UITableViewCell
 
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        self.setupEverythigng()
+        setupEverythigng()
     }
 
     
@@ -114,7 +138,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     
     /// Call this function to hide the buttons programmaticaly with animation. For non animated version use hideButtons(animated: Bool).
     func hideButtons() {
-        self.hideButtons(true)
+        hideButtons(true)
     }
     /// Call this function to hide the buttons programmaticaly.
     ///
@@ -131,6 +155,10 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         if (velocity.x < 0) { // view panned left
             if (panRec.state == .Began) {
                 self.handleLeftPanGestureBegan()
+            }
+        } else {
+            if (panRec.state == .Began) {
+                self.handleRightPanGestureBegan()
             }
         }
         
@@ -173,6 +201,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     }
     
     private func addTapGestureRecognizer() {
+        removeTapGestureRecognizer()
         _tapRec = UITapGestureRecognizer(target: self, action: "viewTapped:")
         if let validTap = _tapRec {
             validTap.cancelsTouchesInView = true
@@ -190,19 +219,35 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     
     // MARK: - Button views
 
-    private func addButtonsView() {
-        if (_buttonsView != nil) {
-            removeButtonsView()
+    private func addLeftButtonsView() {
+        if (_leftButtonsView != nil) {
+            removeLeftButtonsView()
         }
-        _buttonsView = self.prepareButtonsView()
-        _buttonsView?.frame = CGRectMake(self.contentView.frame.size.width, 0, _buttonsViewWidth, self.contentView.frame.size.height)
-        _buttonsView?.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-        _buttonsView?.backgroundColor = UIColor.redColor()
-        self.contentView.addSubview(_buttonsView!)
-        addTapGestureRecognizer()
+        if leftButtonsTitles.count > 0 {
+            _leftButtonsView = prepareButtonsView(leftButtonsTitles)
+            _leftButtonsViewWidth = _leftButtonsView!.frame.size.width
+            _leftButtonsView?.frame = CGRectMake(-_leftButtonsViewWidth, 0, _leftButtonsViewWidth, self.contentView.frame.size.height)
+            _leftButtonsView?.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+            self.contentView.addSubview(_leftButtonsView!)
+            addTapGestureRecognizer()
+        }
     }
     
-    private func prepareButtonsView() -> UIView {
+    private func addRightButtonsView() {
+        if (_rightButtonsView != nil) {
+            removeRightButtonsView()
+        }
+        if rightButtonsTitles.count > 0 {
+            _rightButtonsView = prepareButtonsView(rightButtonsTitles)
+            _rightButtonsViewWidth = _rightButtonsView!.frame.size.width
+            _rightButtonsView?.frame = CGRectMake(self.contentView.frame.size.width, 0, _rightButtonsViewWidth, self.contentView.frame.size.height)
+            _rightButtonsView?.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+            self.contentView.addSubview(_rightButtonsView!)
+            addTapGestureRecognizer()
+        }
+    }
+    
+    private func prepareButtonsView(buttonsTitles: [Any]) -> UIView {
         if buttonsTitles.count > 0 {
             let view = UIView(frame: CGRectMake(0, 0, 0, self.contentView.frame.size.height))
             var maxButtonsWidth: CGFloat = 0
@@ -222,7 +267,6 @@ public class ICSwipeActionsTableCell: UITableViewCell {
                     currentX += maxButtonsWidth
                 }
             }
-            _buttonsViewWidth = view.frame.size.width
             return view
         }
         return UIView()
@@ -270,9 +314,15 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         return UIColor(hue: hue, saturation: saturation, brightness: brightness, alpha: 1)
     }
     
-    private func removeButtonsView() {
-        _buttonsView?.removeFromSuperview()
-        _buttonsView = nil
+    private func removeRightButtonsView() {
+        _rightButtonsView?.removeFromSuperview()
+        _rightButtonsView = nil
+        _buttonsAreHiding = false
+    }
+    
+    private func removeLeftButtonsView() {
+        _leftButtonsView?.removeFromSuperview()
+        _leftButtonsView = nil
         _buttonsAreHiding = false
     }
     
@@ -280,12 +330,14 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         if ( !_buttonsAreHiding) {
             let newContentViewCenter = CGPointMake(_initialContentViewCenter.x, self.contentView.center.y)
             _currentContentViewCenter = newContentViewCenter
-            _swipeExpanded = false
+            _rightSwipeExpanded = false
+            _leftSwipeExpanded = false
             _buttonsAreHiding = true
             removeTableOverlay()
             
             func completition() {
-                self.removeButtonsView()
+                self.removeLeftButtonsView()
+                self.removeRightButtonsView()
                 self.restoreTableSelection()
                 self.removeTapGestureRecognizer()
             }
@@ -316,26 +368,58 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     // MARK: - GestureHandlers
 
     private func handleLeftPanGestureBegan() {
+        if _leftSwipeExpanded {
+            
+        } else {
+            if rightButtonsTitles.count > 0 {
+                unselect()
+                addRightButtonsView()
+                _rightSwipeExpanded = true
+            }
+        }
+    }
+    
+    private func handleRightPanGestureBegan() {
+        if _rightSwipeExpanded {
+            
+        } else {
+            if leftButtonsTitles.count > 0 {
+                unselect()
+                addLeftButtonsView()
+                _leftSwipeExpanded = true
+            }
+        }
+    }
+    
+    private func unselect() {
         if (self.selected) {
             self.selected = false
         }
-        self.addButtonsView()
-        _swipeExpanded = true
     }
     
     private func handlePanGestureEnded(panRec: UIPanGestureRecognizer, velocity: CGPoint) {
         var newContentViewCenter = CGPointZero
 
         if (velocity.x < 0) { // view panned left
-            newContentViewCenter = CGPointMake(_initialContentViewCenter.x - _buttonsViewWidth, self.contentView.center.y)
+            if _rightSwipeExpanded {
+                newContentViewCenter = CGPointMake(_initialContentViewCenter.x - _rightButtonsViewWidth, self.contentView.center.y)
+            } else {
+                hideButtonsAnimated(true, velocity: velocity)
+            }
+        } else { // view panned right
+            if _leftSwipeExpanded {
+                newContentViewCenter = CGPointMake(_initialContentViewCenter.x + _leftButtonsViewWidth, self.contentView.center.y)
+            } else {
+                hideButtonsAnimated(true, velocity: velocity)
+            }
+        }
+        if newContentViewCenter != CGPointZero {
             _currentContentViewCenter = newContentViewCenter
             UIView.animateWithDuration(animationDuration, delay: 0, options: .CurveEaseInOut, animations: { () -> Void in
                 self.contentView.center = newContentViewCenter
                 }) { (completed) -> Void in
                     self.addTableOverlay()
             }
-        } else {
-            hideButtonsAnimated(true, velocity: velocity)
         }
     }
     
@@ -343,11 +427,11 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         let translation = panRec.translationInView(self)
         
         let newCenter = CGPointMake(self.contentView.center.x + translation.x, self.contentView.center.y)
-        if ((_initialContentViewCenter.x - newCenter.x) < _buttonsViewWidth) { // no more then buttons width
-            if (_initialContentViewCenter.x - newCenter.x > 0) { // no more then view size
-                self.contentView.center = newCenter
-                _currentContentViewCenter = newCenter
-            }
+        let panIsWithinRightMotionRange = (_initialContentViewCenter.x - newCenter.x) < _rightButtonsViewWidth
+        let panIsWithinLeftMotionRange = (newCenter.x - _initialContentViewCenter.x) < _leftButtonsViewWidth
+        if (panIsWithinLeftMotionRange && panIsWithinRightMotionRange) { // no more then buttons width
+            self.contentView.center = newCenter
+            _currentContentViewCenter = newCenter
         }
         panRec.setTranslation(CGPointZero, inView: self)
     }

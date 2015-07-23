@@ -3,7 +3,7 @@
 [![CocoaPods](https://img.shields.io/cocoapods/v/ICSwipeActionsTableCell.svg)](https://github.com/imaginary-cloud/ICSwipeActionsTableCell) [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 This is a simple Swift class that lets you add as many additional buttons to a table view cell as you like :-)
-It's written in Swift 2.0 and takes full advantage of it's features, making it super simple tu use.
+It's written in Swift 2.0 and takes full advantage of it's features, making it super simple tu use. Checkout the demo app to see how it works. And below are the steps needed to add it to your project.
 
 ![alt tag](http://cdn.makeagif.com/media/7-22-2015/v3DVWz.gif)
 
