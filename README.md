@@ -70,7 +70,7 @@ cell.buttonsEqualSize = true
 ```
 ![alt tag](http://i.imgur.com/LpO7FQu.png)
 
-Stay tuned! This library is not left here on it's own. More features and customisations will come! Please submit issues with you suggestions :-)
+Stay tuned! This library is not left here on it's own. More features and customisations will come! Please submit issues with any bugs or suggestions :-)
 
 ## Support
 

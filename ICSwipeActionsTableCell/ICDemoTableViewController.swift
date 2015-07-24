@@ -11,6 +11,7 @@ class ICDemoTableViewController: UITableViewController, ICSwipeActionsTableCellD
     let moreButtonTitle = "MORE"
     let deleteButtonTitle = "DELETE"
     
+    
     // MARK: - UIViewController
     
     override func viewDidLoad() {

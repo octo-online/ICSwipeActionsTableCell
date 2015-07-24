@@ -138,12 +138,12 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     
     /// Call this function to hide the buttons programmaticaly with animation. For non animated version use hideButtons(animated: Bool).
     func hideButtons() {
-        hideButtons(true)
+        hideButtons(animated: true)
     }
     /// Call this function to hide the buttons programmaticaly.
     ///
     /// :param: animated optional parameter to determint if the action should be animated or not. Default value is true.
-    func hideButtons(animated: Bool) {
+    func hideButtons(animated animated: Bool) {
         hideButtonsAnimated(animated, velocity: CGPointZero)
     }
     
@@ -331,7 +331,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         _buttonsAreHiding = false
     }
     
-    func hideButtonsAnimated(animated: Bool, velocity: CGPoint) {
+    private func hideButtonsAnimated(animated: Bool, velocity: CGPoint) {
         if ( !_buttonsAreHiding) {
             let newContentViewCenter = CGPointMake(_initialContentViewCenter.x, self.contentView.center.y)
             _currentContentViewCenter = newContentViewCenter
