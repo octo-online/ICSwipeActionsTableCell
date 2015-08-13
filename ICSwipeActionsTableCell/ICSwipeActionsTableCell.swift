@@ -70,7 +70,15 @@ public class ICSwipeActionsTableCell: UITableViewCell {
   
     /// Buttons view edge inset, this property is useful to add margin on all sides of the buttons views. Default value is UIEdgeZero (no margin corner)
     public var buttonsViewEdgeInsets: UIEdgeInsets = UIEdgeInsetsZero
-
+  
+    /// Layout orientation of the buttons, this property defines if the buttons are stacked horizontally or vertically. `buttonsEqualSize` ans `buttonsSideMargins` have no impact when orientation is Vertical. Default is Horizontal.
+    public var buttonsViewLayoutOrientation: ButtonsViewLayoutOrientationType = .Horizontal
+  
+    public enum ButtonsViewLayoutOrientationType {
+        case Horizontal
+        case Vertical
+    }
+  
     // MARK: - private properties
 
     private var _panRec: UIPanGestureRecognizer?
@@ -263,24 +271,35 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     private func prepareButtonsView(buttonsTitles: [Any]) -> UIView {
         if buttonsTitles.count > 0 {
             let view = UIView(frame: CGRectMake(0, 0, 0, self.contentView.frame.size.height))
+            if self.buttonsViewLayoutOrientation == .Vertical {
+                view.frame = CGRectMake(0, 0, self.contentView.frame.size.width/2, 0)
+            }
             view.layer.cornerRadius = self.buttonsViewCornerRadius
             view.clipsToBounds = true
           
-            var maxButtonsWidth: CGFloat = 0
+            var maxButtonsSize: CGFloat = 0
             
             for buttonProperty in buttonsTitles {
                 let button = self.createButtonWith(buttonProperty)
-                button.frame = CGRectMake(view.frame.size.width, 0, button.frame.size.width + 2 * buttonsSideMargins, view.frame.size.height)
-                view.frame = CGRectMake(0, 0, view.frame.size.width + button.frame.width, view.frame.size.height)
-                view.addSubview(button)
-                maxButtonsWidth = max(maxButtonsWidth, button.frame.width)
+              
+                if self.buttonsViewLayoutOrientation == .Horizontal {
+                    button.frame = CGRectMake(view.frame.size.width, 0, button.frame.size.width + 2 * buttonsSideMargins, view.frame.size.height)
+                    view.frame = CGRectMake(0, 0, view.frame.size.width + button.frame.width, view.frame.size.height)
+                    view.addSubview(button)
+                    maxButtonsSize = max(maxButtonsSize, button.frame.width)
+                } else {
+                    button.frame = CGRectMake(0, view.frame.size.height, view.frame.size.width, self.contentView.frame.size.height / CGFloat(buttonsTitles.count))
+                    view.frame = CGRectMake(0, 0, view.frame.size.width, view.frame.size.height + button.frame.height)
+                    view.addSubview(button)
+                    maxButtonsSize = max(maxButtonsSize, button.frame.height)
+                }
             }
-            if buttonsEqualSize {
-                view.frame = CGRectMake(0, 0, maxButtonsWidth * CGFloat(buttonsTitles.count), view.frame.size.height)
+            if buttonsEqualSize && self.buttonsViewLayoutOrientation == .Horizontal {
+                view.frame = CGRectMake(0, 0, maxButtonsSize * CGFloat(buttonsTitles.count), view.frame.size.height)
                 var currentX: CGFloat = 0
                 for button in view.subviews {
-                    button.frame = CGRectMake(currentX, 0, maxButtonsWidth, view.frame.size.height)
-                    currentX += maxButtonsWidth
+                    button.frame = CGRectMake(currentX, 0, maxButtonsSize, view.frame.size.height)
+                    currentX += maxButtonsSize
                 }
             }
             return view
