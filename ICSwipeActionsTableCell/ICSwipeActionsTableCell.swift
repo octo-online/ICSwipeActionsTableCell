@@ -64,6 +64,9 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     
     /// The delegate that will respond to cell action callbacks.
     public var delegate: ICSwipeActionsTableCellDelegate?
+  
+    /// Buttons view corner radius, this property is applied to both left and right views. Default value is 0.0 (no rounded corner)
+    public var buttonsViewCornerRadius: CGFloat = 0.0
 
     // MARK: - private properties
 
@@ -255,6 +258,8 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     private func prepareButtonsView(buttonsTitles: [Any]) -> UIView {
         if buttonsTitles.count > 0 {
             let view = UIView(frame: CGRectMake(0, 0, 0, self.contentView.frame.size.height))
+            view.layer.cornerRadius = self.buttonsViewCornerRadius
+            view.clipsToBounds = true
             var maxButtonsWidth: CGFloat = 0
             
             for buttonProperty in buttonsTitles {
