@@ -395,24 +395,16 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     // MARK: - GestureHandlers
 
     private func handleLeftPanGestureBegan() {
-        if _leftSwipeExpanded {
-            
-        } else {
-            if rightButtonsTitles.count > 0 {
-                addButtonViews()
-                _rightSwipeExpanded = true
-            }
+        if !_rightSwipeExpanded && rightButtonsTitles.count > 0 {
+            addButtonViews()
+            _rightSwipeExpanded = true
         }
     }
     
     private func handleRightPanGestureBegan() {
-        if _rightSwipeExpanded {
-            
-        } else {
-            if leftButtonsTitles.count > 0 {
-                addButtonViews()
-                _leftSwipeExpanded = true
-            }
+        if !_leftSwipeExpanded && leftButtonsTitles.count > 0 {
+            addButtonViews()
+            _leftSwipeExpanded = true
         }
     }
     
