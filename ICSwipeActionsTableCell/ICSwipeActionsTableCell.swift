@@ -74,6 +74,13 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     /// Layout orientation of the buttons, this property defines if the buttons are stacked horizontally or vertically. `buttonsEqualSize` ans `buttonsSideMargins` have no impact when orientation is Vertical. Default is Horizontal.
     public var buttonsViewLayoutOrientation: ButtonsViewLayoutOrientationType = .Horizontal
   
+    /// Front View.
+    @IBOutlet public weak var frontView: UIView? {
+      didSet {
+        _animatableView = frontView!
+      }
+    }
+  
     public enum ButtonsViewLayoutOrientationType {
         case Horizontal
         case Vertical
@@ -83,7 +90,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
 
     private var _panRec: UIPanGestureRecognizer?
     private var _tapRec: UITapGestureRecognizer?
-    
+  
     private var _initialContentViewCenter = CGPointZero
     private var _currentContentViewCenter = CGPointZero
     
@@ -99,9 +106,12 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     private var _currentTableView: UITableView?
     private var _currentTableViewOverlay: ICTableViewOvelay?
 
+    private var _animatableView: UIView
+
     // MARK: - NSObject
 
     required public init(coder aDecoder: NSCoder) {
+        self._animatableView = UIView()
         super.init(coder: aDecoder)!
         setupEverythigng()
     }
@@ -142,6 +152,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     // MARK: - UITableViewCell
 
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+        self._animatableView = UIView()
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupEverythigng()
     }
@@ -203,6 +214,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     // MARK: - Setup
 
     private func setupEverythigng() {
+        _animatableView = contentView
         self.addPanGestureRecognizer()
     }
     
@@ -248,16 +260,16 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     }
     
     private func addRightButtonsView() {
-        if (_rightButtonsView != nil) {
-            removeRightButtonsView()
-        }
-        if rightButtonsTitles.count > 0 {
+//        if (_rightButtonsView != nil) {
+//            removeRightButtonsView()
+//        }
+        if rightButtonsTitles.count > 0 && _rightButtonsView == nil {
             _rightButtonsView = prepareButtonsView(rightButtonsTitles)
             _rightButtonsViewWidth = _rightButtonsView!.frame.size.width
-            _rightButtonsView?.frame = CGRectMake(self.contentView.frame.size.width, 0, _rightButtonsViewWidth, self.contentView.frame.size.height)
+            _rightButtonsView?.frame = CGRectMake(self.contentView.frame.size.width-(_rightButtonsView?.frame.size.width)!, 0, _rightButtonsViewWidth, self.contentView.frame.size.height)
             _rightButtonsView?.frame = self.addEdgesFromFrame(_rightButtonsView?.frame)
             _rightButtonsView?.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-            self.contentView.addSubview(_rightButtonsView!)
+            self.contentView.insertSubview(_rightButtonsView!, atIndex: 0)
         }
     }
     
@@ -391,7 +403,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
             if animated {
                 var hideAnimationDuration = animationDuration
                 if velocity != CGPointZero {
-                    let currentDelta: Double = Double(_initialContentViewCenter.x) - Double(self.contentView.center.x)
+                    let currentDelta: Double = Double(_initialContentViewCenter.x) - Double(self._animatableView.center.x)
                     let xVelocity: Double = Double(velocity.x)
                     hideAnimationDuration = currentDelta / xVelocity
                     if hideAnimationDuration < 0.0 || hideAnimationDuration > animationDuration {
@@ -399,12 +411,12 @@ public class ICSwipeActionsTableCell: UITableViewCell {
                     }
                 }
                 UIView.animateWithDuration(hideAnimationDuration, delay: 0, options: .CurveEaseInOut, animations: { () -> Void in
-                    self.contentView.center = newContentViewCenter
+                    self._animatableView.center = newContentViewCenter
                     }) { (completed) -> Void in
                         completition()
                 }
             } else {
-                self.contentView.center = newContentViewCenter
+                self._animatableView.center = newContentViewCenter
                 completition()
             }
         }
@@ -454,7 +466,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
             self.addTableOverlay()
 
             UIView.animateWithDuration(animationDuration, delay: 0, options: .CurveEaseInOut, animations: { () -> Void in
-                self.contentView.center = newContentViewCenter
+                self._animatableView.center = newContentViewCenter
                 }) { (completed) -> Void in
             }
         }
@@ -467,7 +479,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         let panIsWithinRightMotionRange = (_initialContentViewCenter.x - newCenter.x) < _rightButtonsViewWidth
         let panIsWithinLeftMotionRange = (newCenter.x - _initialContentViewCenter.x) < _leftButtonsViewWidth
         if (panIsWithinLeftMotionRange && panIsWithinRightMotionRange) { // no more then buttons width
-            self.contentView.center = newCenter
+            self._animatableView.center = newCenter
             _currentContentViewCenter = newCenter
             if _leftSwipeExpanded && (newCenter.x - _initialContentViewCenter.x) < 0 { // view changed from left to right expansion
                 _leftSwipeExpanded = false
@@ -477,7 +489,6 @@ public class ICSwipeActionsTableCell: UITableViewCell {
                 _leftSwipeExpanded = true
             }
         }
-        panRec.setTranslation(CGPointZero, inView: self)
     }
     
     public override func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
