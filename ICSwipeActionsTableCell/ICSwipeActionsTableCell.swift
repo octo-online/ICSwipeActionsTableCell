@@ -88,7 +88,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     // MARK: - NSObject
 
     required public init(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        super.init(coder: aDecoder)!
         setupEverythigng()
     }
 
@@ -503,7 +503,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         }
 
         required init(coder aDecoder: NSCoder) {
-            super.init(coder: aDecoder)
+            super.init(coder: aDecoder)!
         }
         
         override func hitTest(point: CGPoint, withEvent event: UIEvent?) -> UIView? {
