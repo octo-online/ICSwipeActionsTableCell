@@ -67,6 +67,9 @@ public class ICSwipeActionsTableCell: UITableViewCell {
   
     /// Buttons view corner radius, this property is applied to both left and right views. Default value is 0.0 (no rounded corner)
     public var buttonsViewCornerRadius: CGFloat = 0.0
+  
+    /// Buttons view edge inset, this property is useful to add margin on all sides of the buttons views. Default value is UIEdgeZero (no margin corner)
+    public var buttonsViewEdgeInsets: UIEdgeInsets = UIEdgeInsetsZero
 
     // MARK: - private properties
 
@@ -230,6 +233,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
             _leftButtonsView = prepareButtonsView(leftButtonsTitles)
             _leftButtonsViewWidth = _leftButtonsView!.frame.size.width
             _leftButtonsView?.frame = CGRectMake(-_leftButtonsViewWidth, 0, _leftButtonsViewWidth, self.contentView.frame.size.height)
+            _leftButtonsView?.frame = self.addEdgesFromFrame(_leftButtonsView?.frame)
             _leftButtonsView?.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
             self.contentView.addSubview(_leftButtonsView!)
         }
@@ -243,6 +247,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
             _rightButtonsView = prepareButtonsView(rightButtonsTitles)
             _rightButtonsViewWidth = _rightButtonsView!.frame.size.width
             _rightButtonsView?.frame = CGRectMake(self.contentView.frame.size.width, 0, _rightButtonsViewWidth, self.contentView.frame.size.height)
+            _rightButtonsView?.frame = self.addEdgesFromFrame(_rightButtonsView?.frame)
             _rightButtonsView?.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
             self.contentView.addSubview(_rightButtonsView!)
         }
@@ -260,6 +265,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
             let view = UIView(frame: CGRectMake(0, 0, 0, self.contentView.frame.size.height))
             view.layer.cornerRadius = self.buttonsViewCornerRadius
             view.clipsToBounds = true
+          
             var maxButtonsWidth: CGFloat = 0
             
             for buttonProperty in buttonsTitles {
@@ -281,7 +287,18 @@ public class ICSwipeActionsTableCell: UITableViewCell {
         }
         return UIView()
     }
-    
+
+    private func addEdgesFromFrame (frame: CGRect?) -> CGRect {
+        if let frame_ = frame {
+            return CGRectMake(frame_.origin.x + self.buttonsViewEdgeInsets.left,
+                              frame_.origin.y + self.buttonsViewEdgeInsets.top,
+                              frame_.size.width - self.buttonsViewEdgeInsets.left - self.buttonsViewEdgeInsets.right,
+                              frame_.size.height - self.buttonsViewEdgeInsets.top - self.buttonsViewEdgeInsets.bottom)
+        } else {
+            return CGRectZero
+        }
+    }
+
     private func createButtonWith(buttonProperty: Any) -> UIButton {
         let buttonFullProperties = self.buttonsPropertiesFromObject(buttonProperty)
         let button = UIButton(type: .Custom)
