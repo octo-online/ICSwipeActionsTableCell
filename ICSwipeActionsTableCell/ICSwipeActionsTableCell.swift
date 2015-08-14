@@ -475,7 +475,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     private func handleLeftPanGestureChanged(panRec: UIPanGestureRecognizer) {
         let translation = panRec.translationInView(self)
         
-        let newCenter = CGPointMake(self.contentView.center.x + translation.x, self.contentView.center.y)
+        let newCenter = CGPointMake(_animatableView.center.x + translation.x, _animatableView.center.y)
         let panIsWithinRightMotionRange = (_initialContentViewCenter.x - newCenter.x) < _rightButtonsViewWidth
         let panIsWithinLeftMotionRange = (newCenter.x - _initialContentViewCenter.x) < _leftButtonsViewWidth
         if (panIsWithinLeftMotionRange && panIsWithinRightMotionRange) { // no more then buttons width
