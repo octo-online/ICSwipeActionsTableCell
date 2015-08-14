@@ -187,7 +187,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
             }
         }
         
-        self.handleLeftPanGestureChanged(panRec)
+        self.handlePanGestureChanged(panRec)
         
         if (panRec.state == .Ended) {
             self.handlePanGestureEnded(panRec, velocity: velocity)
@@ -246,10 +246,7 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     // MARK: - Button views
 
     private func addLeftButtonsView() {
-        if (_leftButtonsView != nil) {
-            removeLeftButtonsView()
-        }
-        if leftButtonsTitles.count > 0 {
+        if leftButtonsTitles.count > 0 && _leftButtonsView == nil {
             _leftButtonsView = prepareButtonsView(leftButtonsTitles)
             _leftButtonsViewWidth = _leftButtonsView!.frame.size.width
             _leftButtonsView?.frame = CGRectMake(-_leftButtonsViewWidth, 0, _leftButtonsViewWidth, self.contentView.frame.size.height)
@@ -260,9 +257,6 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     }
     
     private func addRightButtonsView() {
-//        if (_rightButtonsView != nil) {
-//            removeRightButtonsView()
-//        }
         if rightButtonsTitles.count > 0 && _rightButtonsView == nil {
             _rightButtonsView = prepareButtonsView(rightButtonsTitles)
             _rightButtonsViewWidth = _rightButtonsView!.frame.size.width
@@ -385,19 +379,20 @@ public class ICSwipeActionsTableCell: UITableViewCell {
     }
     
     private func hideButtonsAnimated(animated: Bool, velocity: CGPoint) {
-        if ( !_buttonsAreHiding) {
-            let newContentViewCenter = CGPointMake(_initialContentViewCenter.x, self.contentView.center.y)
+        if !_buttonsAreHiding {
+            let newContentViewCenter = CGPointMake(self.contentView.center.x, self.contentView.center.y)
             _currentContentViewCenter = newContentViewCenter
             _rightSwipeExpanded = false
             _leftSwipeExpanded = false
             _buttonsAreHiding = true
             removeTableOverlay()
             
-            func completition() {
+            func completion() {
                 self.removeLeftButtonsView()
                 self.removeRightButtonsView()
                 self.restoreTableSelection()
                 self.removeTapGestureRecognizer()
+                self._initialContentViewCenter = self._animatableView.center
             }
             
             if animated {
@@ -413,11 +408,11 @@ public class ICSwipeActionsTableCell: UITableViewCell {
                 UIView.animateWithDuration(hideAnimationDuration, delay: 0, options: .CurveEaseInOut, animations: { () -> Void in
                     self._animatableView.center = newContentViewCenter
                     }) { (completed) -> Void in
-                        completition()
+                        completion()
                 }
             } else {
                 self._animatableView.center = newContentViewCenter
-                completition()
+                completion()
             }
         }
     }
@@ -467,30 +462,31 @@ public class ICSwipeActionsTableCell: UITableViewCell {
 
             UIView.animateWithDuration(animationDuration, delay: 0, options: .CurveEaseInOut, animations: { () -> Void in
                 self._animatableView.center = newContentViewCenter
-                }) { (completed) -> Void in
-            }
+                },  completion: { (Bool) -> Void in
+                self._initialContentViewCenter = self._animatableView.center
+            })
         }
     }
     
-    private func handleLeftPanGestureChanged(panRec: UIPanGestureRecognizer) {
+    private func handlePanGestureChanged(panRec: UIPanGestureRecognizer) {
         let translation = panRec.translationInView(self)
         
-        let newCenter = CGPointMake(_animatableView.center.x + translation.x, _animatableView.center.y)
-        let panIsWithinRightMotionRange = (_initialContentViewCenter.x - newCenter.x) < _rightButtonsViewWidth
-        let panIsWithinLeftMotionRange = (newCenter.x - _initialContentViewCenter.x) < _leftButtonsViewWidth
+        let newCenter = CGPointMake(_initialContentViewCenter.x + translation.x, _animatableView.center.y)
+        let panIsWithinRightMotionRange = (contentView.center.x - newCenter.x) < _rightButtonsViewWidth
+        let panIsWithinLeftMotionRange = (newCenter.x - contentView.center.x) < _leftButtonsViewWidth
         if (panIsWithinLeftMotionRange && panIsWithinRightMotionRange) { // no more then buttons width
             self._animatableView.center = newCenter
             _currentContentViewCenter = newCenter
-            if _leftSwipeExpanded && (newCenter.x - _initialContentViewCenter.x) < 0 { // view changed from left to right expansion
+            if _leftSwipeExpanded && (newCenter.x - _animatableView.center.x) < 0 { // view changed from left to right expansion
                 _leftSwipeExpanded = false
                 _rightSwipeExpanded = true
-            } else if _rightSwipeExpanded && ( _initialContentViewCenter.x - newCenter.x) < 0 {
+            } else if _rightSwipeExpanded && ( _animatableView.center.x - newCenter.x) < 0 {
                 _rightSwipeExpanded = false
                 _leftSwipeExpanded = true
             }
         }
     }
-    
+  
     public override func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
         if (gestureRecognizer == _panRec) {
             
